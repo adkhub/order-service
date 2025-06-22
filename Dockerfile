@@ -1,4 +1,4 @@
-FROM openjdk:21-jdk AS build
+FROM eclipse-temurin:21 AS build
 RUN apt-get update && \
     apt-get install -y wget unzip passwd && \
     wget https://services.gradle.org/distributions/gradle-8.2.1-bin.zip && \
@@ -22,7 +22,7 @@ USER gradleuser
 
 RUN gradle build -x test && ls -l /home/gradleuser/project/build/libs/
 
-FROM openjdk:21-jdk
+FROM eclipse-temurin:21
 WORKDIR /app
 COPY --from=build /home/gradleuser/project/build/libs/*.jar app.jar
 RUN chmod -R 0777 /app
