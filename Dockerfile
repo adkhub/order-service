@@ -3,23 +3,15 @@ RUN apt-get update && \
     apt-get install -y wget unzip passwd && \
     wget https://services.gradle.org/distributions/gradle-8.2.1-bin.zip && \
     unzip gradle-8.2.1-bin.zip -d /opt && \
-    ln -s /opt/gradle-8.2.1/bin/gradle /usr/bin/gradle && \
-    useradd -m -d /home/gradleuser gradleuser && \
-    mkdir -p /home/gradleuser/project/.gradle && \
-    chown -R gradleuser:gradleuser /home/gradleuser
+    ln -s /opt/gradle-8.2.1/bin/gradle /usr/bin/gradle
 
 WORKDIR /home/gradleuser/project
 ENV HOME=/home/gradleuser
 ENV GRADLE_USER_HOME=/home/gradleuser/.gradle
 
-COPY --chown=gradleuser:gradleuser . .
+COPY . .
 
-USER root
-RUN find /home/gradleuser -exec chmod 0777 {} + && ls -laR /home/gradleuser && \
-    ls -laR /home/gradleuser/project/.gradle || echo "No .gradle directory after copy"
-
-USER gradleuser
-
+# Run build as root for maximum compatibility (debugging only)
 RUN gradle build -x test && ls -l /home/gradleuser/project/build/libs/
 
 FROM eclipse-temurin:21
