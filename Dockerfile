@@ -1,4 +1,4 @@
-FROM eclipse-temurin:21-jdk AS build
+FROM openjdk:21-jdk AS build
 RUN apt-get update && \
     apt-get install -y wget unzip && \
     wget https://services.gradle.org/distributions/gradle-8.2.1-bin.zip && \
@@ -15,13 +15,14 @@ ENV GRADLE_USER_HOME=/home/gradleuser/.gradle
 COPY --chown=gradleuser:gradleuser . .
 
 USER root
-RUN find /home/gradleuser -exec chmod 0777 {} + && ls -laR /home/gradleuser
+RUN find /home/gradleuser -exec chmod 0777 {} + && ls -laR /home/gradleuser && \
+    ls -laR /home/gradleuser/project/.gradle || echo "No .gradle directory after copy"
 
 USER gradleuser
 
 RUN gradle build -x test && ls -l /home/gradleuser/project/build/libs/
 
-FROM eclipse-temurin:21-jre
+FROM openjdk:21-jre
 WORKDIR /app
 COPY --from=build /home/gradleuser/project/build/libs/*.jar app.jar
 RUN chmod -R 0777 /app
