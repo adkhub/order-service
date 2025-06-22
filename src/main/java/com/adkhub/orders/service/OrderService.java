@@ -72,7 +72,7 @@ public class OrderService {
     }
 
     private String getApplicationId() {
-        return gcpSecretManagerService.getSecret(projectId, secretId, "latest");
+        return gcpSecretManagerService.getSecret(projectId, secretId, "1");
     }
 
     public String generateShippingID(UUID orderID) {
