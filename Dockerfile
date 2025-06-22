@@ -15,7 +15,7 @@ ENV GRADLE_USER_HOME=/home/gradleuser/.gradle
 COPY --chown=gradleuser:gradleuser . .
 
 USER root
-RUN chmod -R 0777 /home/gradleuser
+RUN find /home/gradleuser -exec chmod 0777 {} + && ls -laR /home/gradleuser
 
 USER gradleuser
 
