@@ -6,7 +6,10 @@ RUN apt-get update && \
     wget https://services.gradle.org/distributions/gradle-8.2.1-bin.zip && \
     unzip gradle-8.2.1-bin.zip -d /opt && \
     ln -s /opt/gradle-8.2.1/bin/gradle /usr/bin/gradle && \
-    useradd -m gradleuser
+    useradd -m gradleuser && \
+    chown -R gradleuser:gradleuser /home/gradle && \
+    mkdir -p /home/gradle/project/.gradle && \
+    chown -R gradleuser:gradleuser /home/gradle/project/.gradle
 
 USER gradleuser
 ENV GRADLE_USER_HOME=/home/gradleuser/.gradle
