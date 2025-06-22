@@ -9,7 +9,7 @@ steps:
       args: [
         'build',
         '-t',
-        '$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPOSITORY/$_SERVICE_NAME:$COMMIT_SHA ',
+        '$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPOSITORY/$_SERVICE_NAME:$COMMIT_SHA',
         '.'
       ]
 
