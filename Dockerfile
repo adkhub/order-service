@@ -9,6 +9,7 @@ RUN apt-get update && \
     chown -R gradleuser:gradleuser /home/gradleuser
 
 WORKDIR /home/gradleuser/project
+ENV HOME=/home/gradleuser
 ENV GRADLE_USER_HOME=/home/gradleuser/.gradle
 
 COPY --chown=gradleuser:gradleuser . .
