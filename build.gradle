@@ -51,3 +51,8 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+// build.gradle
+bootJar {
+	archiveFileName = 'order-service-app.jar' // Forces consistent output name
+}

@@ -1,0 +1,45 @@
+steps:
+  # Build with Gradle
+    - name: gradle:8.7-jdk21
+      entrypoint: ./gradlew
+      args: ["clean", "build"]
+
+  # Build Docker image
+    - name: 'gcr.io/cloud-builders/docker'
+      args: [
+        'build',
+        '-t',
+        '$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPOSITORY/$_SERVICE_NAME:$COMMIT_SHA ',
+        '.'
+      ]
+
+    # Push to Artifact Registry
+    - name: 'gcr.io/cloud-builders/docker'
+      args: [
+        'push',
+        '$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPOSITORY/$_SERVICE_NAME:$COMMIT_SHA'
+      ]
+
+  # Deploy to Cloud Run with Secret Manager integration
+    - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+      entrypoint: gcloud
+      args: [
+        'run', 'deploy', '$_SERVICE_NAME',
+        '--image', '$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPOSITORY/$_SERVICE_NAME:$COMMIT_SHA',
+        '--region', '$_REGION',
+        '--platform', 'managed',
+        '--service-account', 'sa-developers@innate-entry-462509-f5.iam.gserviceaccount.com',
+        '--allow-unauthenticated',
+        '--memory', '512Mi',
+        '--cpu', '1',
+        '--set-secrets',
+        'GOOGLE_GENAI_USE_VERTEXAI=gemini-enabled:latest,GOOGLE_API_KEY=gemini-token:latest'
+      ]
+
+substitutions:
+  _REGION: us-central1
+  _REPOSITORY: adkhub-repo
+  _SERVICE_NAME: order-service-dev
+
+options:
+  logging: CLOUD_LOGGING_ONLY
