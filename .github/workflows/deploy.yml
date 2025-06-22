@@ -16,32 +16,32 @@ jobs:
       PROJECT_ID: innate-entry-462509-f5
 
     steps:
-      - name: [34m====[ CHECKOUT SOURCE CODE ]====[0m
+      - name: CHECKOUT SOURCE CODE
         uses: actions/checkout@v4
 
-      - name: [34m====[ SETUP GOOGLE CLOUD SDK ]====[0m
+      - name: SETUP GOOGLE CLOUD SDK
         uses: google-github-actions/setup-gcloud@v2
         with:
           project_id: ${{ env.PROJECT_ID }}
           service_account_key: ${{ secrets.GCP_SA_KEY }}
           export_default_credentials: true
 
-      - name: [34m====[ CONFIGURE DOCKER FOR ARTIFACT REGISTRY ]====[0m
+      - name: CONFIGURE DOCKER FOR ARTIFACT REGISTRY
         run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
 
-      - name: [32m====[ BUILD DOCKER IMAGE ]====[0m
+      - name: BUILD DOCKER IMAGE
         run: |
-          echo "\n\n================ BUILDING DOCKER IMAGE ================\n"
+          echo "================ BUILDING DOCKER IMAGE ================"
           docker build -t $IMAGE .
 
-      - name: [32m====[ PUSH DOCKER IMAGE TO ARTIFACT REGISTRY ]====[0m
+      - name: PUSH DOCKER IMAGE TO ARTIFACT REGISTRY
         run: |
-          echo "\n\n================ PUSHING DOCKER IMAGE ================\n"
+          echo "================ PUSHING DOCKER IMAGE ================"
           docker push $IMAGE
 
-      - name: [33m====[ DEPLOY TO CLOUD RUN ]====[0m
+      - name: DEPLOY TO CLOUD RUN
         run: |
-          echo "\n\n================ DEPLOYING TO CLOUD RUN ================\n"
+          echo "================ DEPLOYING TO CLOUD RUN ================"
           gcloud run deploy $SERVICE \
             --image $IMAGE \
             --region $REGION \
@@ -51,7 +51,7 @@ jobs:
           CLOUDSDK_CORE_PROJECT: ${{ env.PROJECT_ID }}
           CLOUDSDK_RUN_REGION: ${{ env.REGION }}
 
-      - name: [36m====[ POST-DEPLOYMENT INFO ]====[0m
+      - name: POST-DEPLOYMENT INFO
         run: |
-          echo "\n\n================ DEPLOYMENT COMPLETE ================\n"
+          echo "================ DEPLOYMENT COMPLETE ================"
           gcloud run services describe $SERVICE --region $REGION --format='value(status.url)'
