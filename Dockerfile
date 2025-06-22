@@ -1,6 +1,6 @@
 FROM openjdk:21-jdk AS build
-RUN apt-get update && \
-    apt-get install -y wget unzip && \
+RUN apk update && \
+    apk add --no-cache wget unzip shadow && \
     wget https://services.gradle.org/distributions/gradle-8.2.1-bin.zip && \
     unzip gradle-8.2.1-bin.zip -d /opt && \
     ln -s /opt/gradle-8.2.1/bin/gradle /usr/bin/gradle && \
