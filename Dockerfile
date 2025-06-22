@@ -22,7 +22,7 @@ USER gradleuser
 
 RUN gradle build -x test && ls -l /home/gradleuser/project/build/libs/
 
-FROM openjdk:21-jre
+FROM openjdk:21-jdk
 WORKDIR /app
 COPY --from=build /home/gradleuser/project/build/libs/*.jar app.jar
 RUN chmod -R 0777 /app
