@@ -14,6 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import javax.annotation.PostConstruct;
+
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
@@ -35,6 +37,13 @@ public class OrderService {
 
     @Value("${secret.id}")
     private String secretId;
+
+    private String cachedApplicationId;
+
+    @PostConstruct
+    public void init() {
+        this.cachedApplicationId = gcpSecretManagerService.getSecret(projectId, secretId, "latest");
+    }
 
     public Order createOrder(String description) {
         log.info("Creating new order with description: {}", description);
@@ -71,16 +80,12 @@ public class OrderService {
         return orderOpt;
     }
 
-    private String getApplicationId() {
-        return gcpSecretManagerService.getSecret(projectId, secretId, "latest");
-    }
-
     public String generateShippingID(UUID orderID) {
         String url = shippingServiceUrl + "/generate-shipping-id?orderId=" + orderID;
         log.info("Requesting shipping ID from {} for order ID {}", url, orderID);
         try {
             HttpHeaders headers = new HttpHeaders();
-            headers.set("application-id", getApplicationId());
+            headers.set("application-id", this.cachedApplicationId);
             HttpEntity<String> entity = new HttpEntity<>(headers);
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
             String shippingIdStr = response.getBody();
