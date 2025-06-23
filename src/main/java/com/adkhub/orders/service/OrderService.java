@@ -77,7 +77,7 @@ public class OrderService {
 
     public String generateShippingID(UUID orderID) {
         String url = shippingServiceUrl + "/generate-shipping-id?orderId=" + orderID;
-        log.info("Requesting shipping ID from {} for order ID {}", url, orderID);
+        log.info("Requesting shipping ID from shipping service for order ID {}", orderID);
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.set("application-id", getApplicationId());
