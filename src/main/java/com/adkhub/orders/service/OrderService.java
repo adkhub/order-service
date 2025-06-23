@@ -57,8 +57,8 @@ public class OrderService {
         try {
             String shippingId = generateShippingID(orderOpt.get().getId());
             if (shippingId == null) {
-                log.error("Failed to generate shipping ID for order {}. Order confirmation failed.", id);
-                return Optional.empty(); // Return empty if shipping ID cannot be generated
+                log.error("Failed to generate shipping ID for order {}. Confirmation aborted.", id);
+                throw new RuntimeException("Failed to generate shipping ID. Order confirmation aborted.");
             }
             orderOpt.get().setShippingId(shippingId);
             orderOpt.get().setConfirmed(true);
@@ -66,18 +66,13 @@ public class OrderService {
             log.info("Order {} confirmed successfully with shipping ID {}.", id, shippingId);
         } catch (Exception e) {
             log.error("Error confirming order {}: {}", id, e.getMessage(), e);
-            return Optional.empty(); // Also return empty for any other exceptions during confirmation
+            throw e;
         }
         return orderOpt;
     }
 
     private String getApplicationId() {
-        try {
-            return gcpSecretManagerService.getSecret(projectId, secretId, "latest");
-        } catch (Exception e) {
-            log.error("Failed to retrieve secret '{}' for project '{}': {}. Returning empty string.", secretId, projectId, e.getMessage());
-            return ""; // Return an empty string if secret retrieval fails
-        }
+        return gcpSecretManagerService.getSecret(projectId, secretId, "latest");
     }
 
     public String generateShippingID(UUID orderID) {
