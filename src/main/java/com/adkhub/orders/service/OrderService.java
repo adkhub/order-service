@@ -43,7 +43,7 @@ public class OrderService {
                         .description(description)
                         .confirmed(false)
                         .createdAt(LocalDateTime.now())
-                        .build()
+                .build()
         );
     }
 
@@ -71,16 +71,12 @@ public class OrderService {
         return orderOpt;
     }
 
-    private String getApplicationId() {
-        return gcpSecretManagerService.getSecret(projectId, secretId, "latest");
-    }
-
     public String generateShippingID(UUID orderID) {
         String url = shippingServiceUrl + "/generate-shipping-id?orderId=" + orderID;
         log.info("Requesting shipping ID from {} for order ID {}", url, orderID);
         try {
             HttpHeaders headers = new HttpHeaders();
-            headers.set("application-id", getApplicationId());
+            headers.set("application-id", gcpSecretManagerService.getSecret(projectId, secretId, "latest"));
             HttpEntity<String> entity = new HttpEntity<>(headers);
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
             String shippingIdStr = response.getBody();
