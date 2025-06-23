@@ -84,6 +84,10 @@ public class OrderService {
             HttpEntity<String> entity = new HttpEntity<>(headers);
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
             String shippingIdStr = response.getBody();
+            if (shippingIdStr == null || shippingIdStr.trim().isEmpty()) {
+                log.error("Received null or empty shipping ID for order {}.", orderID);
+                return null;
+            }
             log.info("Received shipping ID response: {}", shippingIdStr);
             return shippingIdStr;
         } catch (Exception e) {
